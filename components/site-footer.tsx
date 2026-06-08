@@ -9,7 +9,7 @@ export function SiteFooter() {
             Chauncey<span className="text-clay"> Tse</span>
           </p>
           <p className="mt-1 text-sm text-ink-2">
-            {footer.blurb} · {site.area} · {site.zip}
+            {footer.blurb} · {site.area}
           </p>
         </div>
         <div className="flex flex-col gap-1 text-sm text-ink-2 md:items-end">

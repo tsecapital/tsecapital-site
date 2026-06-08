@@ -12,8 +12,7 @@ export const site = {
   // While this starts with "your-", the booking section shows an email
   // fallback instead of the live calendar embed.
   calLink: "chaunceytse/intro",
-  area: "Brentwood & West LA",
-  zip: "90049",
+  area: "West Los Angeles",
   url: "https://tsecapital.co",
 };
 
@@ -28,7 +27,7 @@ export const nav = [
 ];
 
 export const hero = {
-  eyebrow: `AI automation · ${"Brentwood & West LA"}`,
+  eyebrow: "AI automation · West Los Angeles",
   lead: "I’m Chauncey — I put Claude, today’s most capable AI, to work on the repetitive tasks that eat your week: intake, scheduling, follow-ups, data entry, and reporting. I’ll either build it for you, or get your team using Claude themselves.",
   primaryCta: { label: "Book a free intro call", href: "#book" },
   secondaryCta: { label: "See how it works", href: "#process" },
@@ -204,7 +203,7 @@ export const faq = {
     },
     {
       q: "Do you work on-site or remotely?",
-      a: "Both. I’m local to Brentwood and West LA, so I’m glad to meet in person for the kickoff and work remotely from there.",
+      a: "Both. I’m based in West Los Angeles, so I’m glad to meet in person for the kickoff and work remotely from there.",
     },
     {
       q: "What about small, one-off tasks?",

@@ -19,9 +19,9 @@ const hanken = Hanken_Grotesk({
   display: "swap",
 });
 
-const title = "Chauncey Tse — Claude AI Automation & Onboarding | Brentwood & West LA";
+const title = "Chauncey Tse — Claude AI Automation & Onboarding | West Los Angeles";
 const description =
-  "I help Brentwood & West LA businesses put Claude to work — automating the busywork (intake, scheduling, follow-ups, reporting) and onboarding your team to Claude and Claude Code. Fixed prices. Book a free intro call.";
+  "I help West Los Angeles businesses put Claude to work — automating the busywork (intake, scheduling, follow-ups, reporting) and onboarding your team to Claude and Claude Code. Fixed prices. Book a free intro call.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -34,9 +34,9 @@ export const metadata: Metadata = {
     "Claude onboarding",
     "Claude Code training",
     "small business AI consultant",
-    "Brentwood",
+    "West Los Angeles",
     "West LA",
-    "90049",
+    "Los Angeles",
     "workflow automation",
     "AI for dentists lawyers real estate",
   ],
@@ -71,9 +71,8 @@ const jsonLd = {
   },
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Los Angeles",
+    addressLocality: "West Los Angeles",
     addressRegion: "CA",
-    postalCode: site.zip,
     addressCountry: "US",
   },
   founder: { "@type": "Person", name: "Chauncey Tse" },

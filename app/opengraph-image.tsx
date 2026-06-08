@@ -33,7 +33,7 @@ export default function OpengraphImage() {
           }}
         >
           <span style={{ color: "#221d16", fontWeight: 700 }}>Chauncey Tse</span>
-          <span>BRENTWOOD · WEST LA · 90049</span>
+          <span>WEST LOS ANGELES</span>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
