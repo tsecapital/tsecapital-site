@@ -25,7 +25,7 @@ Open to a quick look? {{CalLink}} — or just reply.
 
 — Chauncey Tse
 AI automation · West Los Angeles · previously at Google, Amex & KPMG
-chauncey@tsecapital.co
+chauncey.tse@gmail.com
 
 <sub>{{YourAddress}} · Not useful? Reply "no thanks" and I won't write again.</sub>
 

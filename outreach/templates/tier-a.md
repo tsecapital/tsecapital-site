@@ -28,7 +28,7 @@ Worth a look? My calendar's here: {{CalLink}} — or just reply and I'll find a 
 — Chauncey Tse
 AI automation · West Los Angeles
 Previously at Google, American Express & KPMG
-chauncey@tsecapital.co · tsecapital.co
+chauncey.tse@gmail.com · tsecapital.co
 
 <sub>{{YourAddress}} · Not useful? Reply "no thanks" and I won't write again.</sub>
 

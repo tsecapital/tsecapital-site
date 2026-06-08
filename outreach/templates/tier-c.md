@@ -20,7 +20,7 @@ If you've got a task that feels like it should run itself, it's usually one I ca
 {{CalLink}}, or just reply.
 
 — Chauncey Tse · previously at Google, Amex & KPMG
-chauncey@tsecapital.co · tsecapital.co
+chauncey.tse@gmail.com · tsecapital.co
 
 <sub>{{YourAddress}} · Not useful? Reply "no thanks" and I won't write again.</sub>
 

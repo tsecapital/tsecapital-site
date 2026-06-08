@@ -76,9 +76,9 @@ const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g
 const SIG_FULL = `— Chauncey Tse
 AI automation · West Los Angeles
 Previously at Google, American Express & KPMG
-chauncey@tsecapital.co · tsecapital.co`;
+chauncey.tse@gmail.com · tsecapital.co`;
 const SIG_SHORT = `— Chauncey Tse · previously at Google, Amex & KPMG
-chauncey@tsecapital.co · tsecapital.co`;
+chauncey.tse@gmail.com · tsecapital.co`;
 const optOut = `${ADDRESS} · Not useful? Reply "no thanks" and I won't write again.`;
 
 function render(row) {
