@@ -1,11 +1,14 @@
-// Fit × size scoring and A/B/C tiering.
+// Fit × size scoring and tiering.
 //
-// The score rewards three things, in priority order:
+// SCORE rewards, in priority order:
 //   1. Vertical FIT     — how well AI automation fits the business (from config)
 //   2. SIZE / establishment — review count as a revenue proxy (log-scaled)
-//   3. A real website + a good rating — signals they're established & reachable
+//   3. A real website + a good rating — established & reachable
 //
-// Tier A = the businesses you email first: high-fit, established, can afford you.
+// TIERS are assigned by PERCENTILE of score across the final list, not by fixed
+// thresholds. In a dense, affluent area like West LA almost every established
+// business clears any absolute bar, so fixed thresholds put ~everyone in Tier A.
+// Percentiles always give you a usable gradient: A = your best ~20%, etc.
 
 // Review count → 0..7, log-scaled (diminishing returns).
 //   10 reviews → 2.4   50 → 3.9   100 → 4.6   500 → 6.2   1000+ → ~7 (capped)
@@ -14,29 +17,34 @@ function sizeFactor(reviews) {
   return Math.min(7, Math.log(reviews + 1));
 }
 
-// place: { fit, reviews, rating, website }  →  { score, tier }
-function scoreAndTier(place) {
+// place: { fit, reviews, rating, website } → numeric score
+function computeScore(place) {
   const reviews = Number(place.reviews) || 0;
   const rating = Number(place.rating) || 0;
-  const hasSite = !!place.website;
-
-  const siteBonus = hasSite ? 2 : 0;
+  const siteBonus = place.website ? 2 : 0;
   const ratingBonus = rating >= 4.5 ? 2 : rating >= 4.0 ? 1 : 0;
-
-  const score = Number(
+  return Number(
     (place.fit * (sizeFactor(reviews) + siteBonus) + ratingBonus).toFixed(1)
   );
+}
 
-  let tier;
-  if (place.fit >= 3 && reviews >= 50 && hasSite && score >= 15) {
-    tier = "A"; // high-fit + established + reachable
-  } else if (score >= 8 || (reviews >= 20 && hasSite)) {
-    tier = "B"; // decent fit or solid mid-size signals
-  } else {
-    tier = "C"; // low fit / small / no website
-  }
+// Assign A/B/C across a set of CSV-shaped rows (need .Score, .Website, .Reviews).
+// Top `aPct` by score = A, next `bPct` = B, rest = C — with guardrails so an
+// "A" always has a website + real traction.
+function assignTiers(rows, aPct = 0.2, bPct = 0.4) {
+  const sorted = [...rows].sort(
+    (a, b) => (Number(b.Score) || 0) - (Number(a.Score) || 0)
+  );
+  const n = sorted.length;
+  const aCut = Math.round(n * aPct);
+  const bCut = Math.round(n * (aPct + bPct));
 
-  return { score, tier };
+  sorted.forEach((r, i) => {
+    let tier = i < aCut ? "A" : i < bCut ? "B" : "C";
+    // Guardrail: Tier A must be reachable + established.
+    if (tier === "A" && (!r.Website || (Number(r.Reviews) || 0) < 50)) tier = "B";
+    r.Tier = tier;
+  });
 }
 
 const TIER_RANK = { A: 0, B: 1, C: 2, "": 3 };
@@ -49,4 +57,4 @@ function byTierThenScore(a, b) {
   return (Number(b.Score) || 0) - (Number(a.Score) || 0);
 }
 
-module.exports = { scoreAndTier, byTierThenScore, sizeFactor };
+module.exports = { computeScore, assignTiers, byTierThenScore, sizeFactor };

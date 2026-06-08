@@ -17,10 +17,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const path = require("path");
-const { CENTER, RADIUS_MILES, RADIUS_METERS, TARGET_COUNT, VERTICALS } = require("./config");
+const { CENTER, RADIUS_MILES, RADIUS_METERS, TARGET_COUNT, PER_VERTICAL_CAP, VERTICALS } = require("./config");
 const { searchAllPages } = require("./lib/places");
 const { haversineMiles } = require("./lib/geo");
-const { scoreAndTier, byTierThenScore } = require("./lib/score");
+const { computeScore, assignTiers, byTierThenScore } = require("./lib/score");
 const csv = require("./lib/csv");
 
 const CSV_PATH = path.join(__dirname, "..", "contacts.csv");
@@ -97,16 +97,38 @@ async function main() {
       }
       console.log(`  ${v.type.padEnd(18)} "${query}" → +${kept} (total ${byId.size})`);
     }
-    if (byId.size >= args.limit * 1.6) break; // plenty of candidates; stop early
   }
 
-  // Score, tier, sort, trim to the target.
-  const scored = [...byId.values()].map((b) => {
-    const { score, tier } = scoreAndTier(b);
-    return { ...b, score, tier };
-  });
+  // Score every candidate.
+  const scored = [...byId.values()].map((b) => ({ ...b, score: computeScore(b) }));
 
-  const newRows = scored.map((b) => ({
+  // Balance across verticals with a round-robin by score rank: take each
+  // vertical's best, then everyone's 2nd-best, and so on until we hit the
+  // target. Every requested vertical gets fair representation (up to what's
+  // available, bounded by PER_VERTICAL_CAP) instead of the densest few crowding
+  // the rest out. Tiering later still surfaces the best prospects first.
+  const byType = new Map();
+  for (const b of scored) {
+    if (!byType.has(b.type)) byType.set(b.type, []);
+    byType.get(b.type).push(b);
+  }
+  const lists = [...byType.values()];
+  for (const list of lists) list.sort((a, b) => b.score - a.score);
+
+  const selected = [];
+  for (let rank = 0; selected.length < args.limit; rank++) {
+    let added = 0;
+    for (const list of lists) {
+      if (rank < Math.min(list.length, PER_VERTICAL_CAP)) {
+        selected.push(list[rank]);
+        added++;
+        if (selected.length >= args.limit) break;
+      }
+    }
+    if (added === 0) break; // every vertical exhausted or capped
+  }
+
+  const newRows = selected.map((b) => ({
     Business: b.name,
     Contact: "",
     Type: b.type,
@@ -116,7 +138,7 @@ async function main() {
     Channel: "",
     Status: "",
     Notes: "",
-    Tier: b.tier,
+    Tier: "",
     Score: b.score,
     Website: b.website,
     Address: b.address,
@@ -124,8 +146,9 @@ async function main() {
     Reviews: b.reviews,
     PlaceID: b.id,
   }));
+  assignTiers(newRows); // A = best ~20%, B = next ~40%, C = rest
   newRows.sort(byTierThenScore);
-  const trimmed = newRows.slice(0, args.limit);
+  const trimmed = newRows;
 
   // ── Merge with the existing file so manual tracking survives a re-run ───────
   const existing = csv.readFile(CSV_PATH);
@@ -145,15 +168,24 @@ async function main() {
     if ((prev.Email || "").trim()) row.Email = prev.Email; // keep a found/edited email
     prevById.delete(row.PlaceID);
   }
-  // Previously-saved businesses not in this pull: keep them at the end.
-  const leftover = [...prevById.values()];
+  // Previously-saved businesses not in this pull: keep ONLY the ones you've
+  // started working (have tracking). Untracked rows from a past fetch are just
+  // stale output — let this run replace them cleanly.
+  const isTracked = (r) =>
+    (r.Status || "").trim() ||
+    (r.Contact || "").trim() ||
+    (r.Notes || "").trim() ||
+    ((r.Email || "").trim() && !(r.Email || "").includes("example.com"));
+  const leftover = [...prevById.values()].filter(isTracked);
   const finalRows = [...trimmed, ...leftover, ...manualRows];
 
   // ── Summary ────────────────────────────────────────────────────────────────
   const counts = { A: 0, B: 0, C: 0 };
+  const byTypeCount = {};
   let withSite = 0, withPhone = 0;
   for (const r of trimmed) {
     counts[r.Tier] = (counts[r.Tier] || 0) + 1;
+    byTypeCount[r.Type] = (byTypeCount[r.Type] || 0) + 1;
     if (r.Website) withSite++;
     if (r.Phone) withPhone++;
   }
@@ -161,6 +193,10 @@ async function main() {
   console.log(`API calls: ${apiCalls} · unique businesses found: ${byId.size}`);
   console.log(`Written:   ${trimmed.length}  (Tier A ${counts.A} · B ${counts.B} · C ${counts.C})`);
   console.log(`Have website: ${withSite}/${trimmed.length} · have phone: ${withPhone}/${trimmed.length}`);
+  console.log(`By vertical:`);
+  for (const [type, n] of Object.entries(byTypeCount).sort((a, b) => b[1] - a[1])) {
+    console.log(`   ${String(n).padStart(3)}  ${type}`);
+  }
   if (leftover.length || manualRows.length)
     console.log(`Preserved:  ${leftover.length + manualRows.length} previously-tracked rows`);
   console.log(`──────────────────────────────────────────────`);

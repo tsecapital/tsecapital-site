@@ -27,13 +27,25 @@ const TIMEOUT_MS = 9000;
 const CONTACT_PATHS = ["", "/contact", "/contact-us", "/about", "/about-us"];
 
 const EMAIL_RE = /[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g;
+// A candidate must match this exactly — rejects template junk like `${email}`,
+// trailing punctuation, and other garbage that the loose scan can pick up.
+const VALID_EMAIL = /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/;
 
-// Substrings that mean "not a real human contact address".
+// Substrings that mean "not a real human contact address" — file assets, CDNs,
+// and (importantly) third-party analytics/marketing/vendor emails that live in
+// page scripts, not the business itself.
 const BLOCKLIST = [
   "example.com", "yourdomain", "domain.com", "email.com", "sentry", "wixpress",
   "godaddy", "squarespace", "cloudflare", "schema.org", "w3.org", "googleapis",
   "gstatic", "jquery", "bootstrap", "fontawesome", "@2x", "@3x", "core-js",
   ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".css", ".js",
+  // vendor / analytics / platform addresses (not the business's own inbox)
+  "keen.io", "segment", "mixpanel", "hotjar", "intercom", "fullstory", "amplitude",
+  "optimizely", "newrelic", "datadog", "bugsnag", "doubleclick", "cloudfront",
+  "akamai", "shopify", "myshopify", "wordpress.com", "wp.com", "elementor",
+  "gravatar", "stripe", "paypalobjects", "facebook", "fbcdn", "linkedin",
+  "instagram", "youtube", "vimeo", "twitter", "cdn.", "sentry.io", "wix.com",
+  "calendly", "hubspot", "mailchimp", "constantcontact", "godaddysites",
 ];
 
 function parseArgs(argv) {
@@ -75,6 +87,7 @@ async function fetchText(url) {
 
 function pickEmail(candidates, siteHost) {
   const cleaned = [...new Set(candidates.map((e) => e.toLowerCase()))].filter((e) => {
+    if (!VALID_EMAIL.test(e)) return false; // strict shape — kills `${email}` etc.
     if (BLOCKLIST.some((b) => e.includes(b))) return false;
     if (e.length > 60) return false;
     return true;
@@ -94,6 +107,15 @@ function pickEmail(candidates, siteHost) {
   return cleaned[0];
 }
 
+// Drop <script>/<style>/comments so we never scrape vendor or template emails
+// embedded in page JavaScript.
+function visibleHtml(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ");
+}
+
 async function findEmail(website) {
   const host = hostOf(website);
   const base = website.replace(/\/+$/, "");
@@ -101,10 +123,19 @@ async function findEmail(website) {
   for (const p of CONTACT_PATHS) {
     const html = await fetchText(base + p);
     if (!html) continue;
-    // mailto: links are the most reliable signal — grab them first.
-    const mailtos = [...html.matchAll(/mailto:([^"'>?\s]+)/gi)].map((m) => m[1]);
+    const visible = visibleHtml(html);
+    // mailto: links are the most reliable signal — but take them from the
+    // visible markup, strip any ?subject=… query, and let pickEmail validate.
+    const mailtos = [...visible.matchAll(/mailto:([^"'>?\s]+)/gi)].map((m) => {
+      const raw = m[1].split("?")[0];
+      try {
+        return decodeURIComponent(raw); // %20 etc.
+      } catch {
+        return raw; // malformed % escapes — keep raw, validator will judge it
+      }
+    });
     found.push(...mailtos);
-    found.push(...(html.match(EMAIL_RE) || []));
+    found.push(...(visible.match(EMAIL_RE) || []));
     const best = pickEmail(found, host);
     if (best) return best; // stop at the first page that yields a good email
   }
@@ -152,7 +183,12 @@ async function main() {
   await pool(
     slice,
     async (row) => {
-      const email = await findEmail(row.Website);
+      let email = "";
+      try {
+        email = await findEmail(row.Website);
+      } catch {
+        email = ""; // one bad site never aborts the batch
+      }
       done++;
       if (email) {
         row.Email = email;

@@ -13,6 +13,10 @@ const RADIUS_METERS = Math.round(RADIUS_MILES * 1609.344); // 8047 m
 // Stop pulling once we have this many businesses (after dedupe + distance filter).
 const TARGET_COUNT = 500;
 
+// Cap per vertical so the 500 spans all your verticals instead of being 200
+// dentists. Bigger verticals can fill more; smaller ones still get a seat.
+const PER_VERTICAL_CAP = 40;
+
 // ── Verticals to target ──────────────────────────────────────────────────────
 // fit  : how well AI automation fits this vertical (3 = best, 2 = good, 1 = ok).
 //        Drives both the tier score and which email hook/example to use.
@@ -48,4 +52,4 @@ const VERTICALS = [
   { type: "Fitness studio",    fit: 2, group: "Higher-ticket",  queries: ["pilates studio", "yoga studio", "personal training gym"] },
 ];
 
-module.exports = { CENTER, RADIUS_MILES, RADIUS_METERS, TARGET_COUNT, VERTICALS };
+module.exports = { CENTER, RADIUS_MILES, RADIUS_METERS, TARGET_COUNT, PER_VERTICAL_CAP, VERTICALS };
