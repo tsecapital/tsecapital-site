@@ -39,6 +39,7 @@ yarn-error.log*
 # local sales/outreach data — never publish lead lists
 /outreach/*.csv
 /outreach/drafts/
+/outreach/signature.html
 
 # typescript
 *.tsbuildinfo
