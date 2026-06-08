@@ -34,7 +34,7 @@ export function Booking() {
           <div className="md:col-span-7">
             <Reveal delay={0.1}>
               {calReady ? (
-                <div className="overflow-hidden rounded-2xl bg-cream p-2">
+                <div className="h-[600px] overflow-hidden rounded-2xl bg-cream p-2">
                   <BookingEmbed calLink={site.calLink} />
                 </div>
               ) : (

@@ -14,7 +14,7 @@ export default function BookingEmbed({ calLink }: { calLink: string }) {
       cal("ui", {
         theme: "light",
         cssVarsPerTheme: { light: { "cal-brand": "#bd5a36" }, dark: {} },
-        hideEventTypeDetails: false,
+        hideEventTypeDetails: true,
         layout: "month_view",
       });
     })();
@@ -23,7 +23,7 @@ export default function BookingEmbed({ calLink }: { calLink: string }) {
   return (
     <Cal
       calLink={calLink}
-      style={{ width: "100%", height: "100%", minHeight: "560px", overflow: "scroll" }}
+      style={{ width: "100%", height: "100%", overflow: "auto" }}
       config={{ layout: "month_view" }}
     />
   );
