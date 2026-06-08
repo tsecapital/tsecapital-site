@@ -1,5 +1,6 @@
 import { hero } from "@/lib/content";
 import { Reveal } from "@/components/reveal";
+import { ClaudeMark } from "@/components/claude-mark";
 
 export function Hero() {
   return (
@@ -48,7 +49,13 @@ export function Hero() {
         </Reveal>
 
         <Reveal delay={0.32}>
-          <p className="mt-6 text-sm text-ink-2">{hero.note}</p>
+          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border hairline bg-cream/60 px-3 py-1.5 text-xs font-medium text-ink">
+              <ClaudeMark className="h-3.5 w-3.5 text-clay" />
+              Built on Claude
+            </span>
+            <p className="text-sm text-ink-2">{hero.note}</p>
+          </div>
         </Reveal>
       </div>
 

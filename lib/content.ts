@@ -29,7 +29,7 @@ export const nav = [
 
 export const hero = {
   eyebrow: `AI automation · ${"Brentwood & West LA"}`,
-  lead: "I’m Chauncey — I put today’s most capable AI to work on the repetitive tasks that eat your week: intake, scheduling, follow-ups, data entry, and reporting. You stay focused on your clients; the busywork runs itself.",
+  lead: "I’m Chauncey — I put Claude, today’s most capable AI, to work on the repetitive tasks that eat your week: intake, scheduling, follow-ups, data entry, and reporting. I’ll either build it for you, or get your team using Claude themselves.",
   primaryCta: { label: "Book a free intro call", href: "#book" },
   secondaryCta: { label: "See how it works", href: "#process" },
   note: "Fixed prices. No jargon. A real engineer — not an agency.",
@@ -70,6 +70,28 @@ export const services = {
   ],
   closer:
     "Don’t see yours? If the work is repetitive, it can probably be automated. That’s what the first call is for.",
+};
+
+export const enablement = {
+  eyebrow: "Claude & Claude Code onboarding",
+  heading: "Or get your team running on Claude themselves.",
+  sub: "Having me build it for you is one path. The other is getting you and your team confidently using Claude every day — and Claude Code, if you build software.",
+  items: [
+    {
+      mark: "Claude",
+      audience: "For your whole team",
+      title: "Onboard your team to Claude",
+      body: "I set up Claude for your business, build the prompts and workflows that match how you actually work, and train your people so it sticks — so they reach for it every day, not just once.",
+    },
+    {
+      mark: "Claude Code",
+      audience: "For founders & developers",
+      title: "Get productive in Claude Code",
+      body: "Claude Code is Anthropic’s agentic coding tool that works right in your terminal and editor. I’ll get you or your devs set up, configured, and shipping real work with it — from first install to agents running in your own codebase.",
+    },
+  ],
+  closer: "Want it built for you, or want to wield it yourself? The first call sorts out which.",
+  cta: { label: "Book a free intro call", href: "#book" },
 };
 
 export const process = {
@@ -171,6 +193,10 @@ export const faq = {
     {
       q: "Is my client and patient data safe?",
       a: "Yes. I use enterprise AI tooling that doesn’t train on your data, scope access to only what’s needed, and I’m glad to sign a confidentiality agreement before we start.",
+    },
+    {
+      q: "Do you train my team, or only build things?",
+      a: "Both. Plenty of clients want their people using Claude directly — so I’ll set it up for your business, build workflows that fit you, and train your team. If you’re technical, I’ll also get you running in Claude Code, Anthropic’s agentic coding tool.",
     },
     {
       q: "How long does it take?",

@@ -19,9 +19,9 @@ const hanken = Hanken_Grotesk({
   display: "swap",
 });
 
-const title = "Chauncey Tse — AI Automation for Local Business | Brentwood & West LA";
+const title = "Chauncey Tse — Claude AI Automation & Onboarding | Brentwood & West LA";
 const description =
-  "I help Brentwood and West LA practices and firms automate the busywork — intake, scheduling, follow-ups, and reporting — with today’s most capable AI. Fixed prices. Book a free intro call.";
+  "I help Brentwood & West LA businesses put Claude to work — automating the busywork (intake, scheduling, follow-ups, reporting) and onboarding your team to Claude and Claude Code. Fixed prices. Book a free intro call.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -29,6 +29,10 @@ export const metadata: Metadata = {
   description,
   keywords: [
     "AI automation",
+    "Claude",
+    "Claude Code",
+    "Claude onboarding",
+    "Claude Code training",
     "small business AI consultant",
     "Brentwood",
     "West LA",
@@ -73,7 +77,14 @@ const jsonLd = {
     addressCountry: "US",
   },
   founder: { "@type": "Person", name: "Chauncey Tse" },
-  knowsAbout: ["AI automation", "workflow automation", "Claude", "small business operations"],
+  knowsAbout: [
+    "AI automation",
+    "workflow automation",
+    "Claude",
+    "Claude Code",
+    "AI onboarding and training",
+    "small business operations",
+  ],
 };
 
 export default function RootLayout({
