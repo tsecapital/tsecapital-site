@@ -10,11 +10,11 @@ export function About() {
           <Reveal>
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border hairline bg-paper-2">
               <Image
-                src="/chauncey.webp"
+                src="/chauncey2.webp"
                 alt="Chauncey Tse"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover"
+                className="object-cover object-top"
               />
             </div>
           </Reveal>
