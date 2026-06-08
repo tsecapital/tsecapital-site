@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  /* Warm editorial palette — cream paper, ink, a single clay accent + brass hairlines */
+  --color-paper: #f4eee2;
+  --color-paper-2: #ece2d1;
+  --color-cream: #f9f4ec;
+  --color-ink: #221d16;
+  --color-ink-2: #5c5446;
+  --color-clay: #bd5a36;
+  --color-clay-deep: #9c4527;
+  --color-brass: #b58e54;
+  --color-rule: #d8cbb2;
+  --color-espresso: #1c1811;
+
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-hanken);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), Georgia, "Times New Roman", serif;
+    font-optical-sizing: auto;
+  }
+
+  ::selection {
+    background: var(--color-clay);
+    color: var(--color-cream);
+  }
+
+  /* Offset anchored sections for the sticky header */
+  [id] {
+    scroll-margin-top: 5.5rem;
+  }
+}
+
+/* Subtle film grain laid over the whole page for paper-like depth */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Brass hairline used for editorial rules */
+.hairline {
+  border-color: color-mix(in srgb, var(--color-brass) 50%, transparent);
+}
+
+/* Thin top-of-letter tracking for eyebrows/labels */
+.label {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
