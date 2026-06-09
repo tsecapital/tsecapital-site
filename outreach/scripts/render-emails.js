@@ -76,22 +76,48 @@ const readable = (type) => READABLE[type] || "local business";
 const snippet = (type) => SNIPPET[type] || DEFAULT_SNIPPET;
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
 
+const art = (t) => (/^[aeiou]/i.test(t) ? "an" : "a");
+const plural = (t) => (/[^aeiou]y$/.test(t) ? t.replace(/y$/, "ies") : t + "s");
+
+// Strip Google/SEO suffixes from listing names, e.g.
+// "Lasting Impressions Dental Spa | Dentist in Encino" → "Lasting Impressions Dental Spa".
+const cleanBiz = (b) =>
+  b.split("|")[0].replace(/\s[-–]\s[^-–]*\b(in|near|of|serving)\s.+$/i, "").trim();
+
+// A first name we can TRUST — only when the business name carries a personal
+// credential or "Dr." prefix, so we never greet "Earnest Homes" as "Earnest".
+function nameFromBusiness(biz) {
+  const head = biz.split(",")[0];
+  const hasDr = /^\s*(dr|drs)\.?\s+/i.test(biz);
+  const hasCred = /,\s*(DDS|DMD|MD|DO|OD|DC|DPM|DVM|VMD|Esq|JD|CPA|FACS|FAAD|FACOG)\b/i.test(biz);
+  if (!hasDr && !hasCred) return null;
+  if (/&|\band\b/i.test(head)) return null; // multi-partner → ambiguous
+  const toks = head.replace(/^(dr|drs)\.?\s+/i, "").replace(/\./g, "").trim().split(/\s+/).filter(Boolean);
+  if (toks.length < 2 || toks.length > 3) return null;
+  if (!/^[A-Z][a-z]{1,}$/.test(toks[0]) || !/^[A-Z][a-z]{1,}$/.test(toks[toks.length - 1])) return null;
+  return toks[0];
+}
+
 function render(row) {
-  const first = (row.Contact || "").trim() || "there";
-  const biz = row.Business;
+  const biz = cleanBiz(row.Business);
   const type = readable(row.Type);
   const [hook, example] = snippet(row.Type);
-  const tier = row.Tier || "B";
 
+  // Real, verifiable personalization we already have: their reputation.
+  const reviews = parseInt(String(row.Reviews || "").replace(/[^0-9]/g, ""), 10) || 0;
+  const rating = String(row.Rating || "").trim();
+  const proof = reviews >= 40 && rating ? `${reviews.toLocaleString()} reviews at ${rating}★` : null;
+
+  const first = (row.Contact || "").trim() || nameFromBusiness(biz) || "there";
   const subject = `a quick idea for ${biz}`;
 
   let intro;
   if (FINANCE.has(row.Type)) {
-    intro = `I spent years in accounting and business intelligence at Google, American Express, and KPMG, so I know how much of your week disappears into reporting, reconciliations, and data entry. That's exactly what I now automate for firms like ${biz} here in West LA.`;
-  } else if (tier === "A") {
-    intro = `I help local businesses here in West LA automate their busywork with AI. I came across ${biz} while looking at ${type}s in the area, and ${lcFirst(hook)}\n\nThat's the kind of thing I automate.`;
+    intro = `I spent years in accounting and business intelligence at Google, American Express, and KPMG, so I know how much of your week disappears into reporting, reconciliations, and data entry — exactly what I now automate for firms like ${biz} here in West LA.`;
+    if (proof) intro += ` (${proof} — your clients clearly trust you; this just gives your team their time back.)`;
   } else {
-    intro = `I build AI automations for ${type}s here in West LA. ${hook}`;
+    const proofClause = proof ? ` — ${proof} is hard to miss` : "";
+    intro = `I help local businesses here in West LA automate their busywork with AI. I came across ${biz} while looking at ${plural(type)} in the area${proofClause}, and ${lcFirst(hook)}`;
   }
 
   const body =
@@ -99,7 +125,7 @@ function render(row) {
 
 I'm Chauncey — ${intro}
 
-For a ${type}, it usually looks like ${example} — running quietly in the background, wired into the tools you already use, with nothing new for your team to learn.
+For ${art(type)} ${type}, that usually looks like ${example} — running quietly in the background, wired into the tools you already use, with nothing new for your team to learn.
 
 I take on a small number of local businesses directly — I'm the one who builds it, not an agency. I'd be glad to do a free 15-minute call and point out the one or two things in your workflow most worth automating. If there's nothing worth doing, I'll tell you on the call.
 
