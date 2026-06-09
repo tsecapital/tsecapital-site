@@ -40,7 +40,7 @@ export function Booking() {
               ) : (
                 <div className="rounded-2xl border border-cream/15 bg-cream/5 p-8 text-center">
                   <p className="font-display text-2xl text-cream">
-                    Book a free 20-minute intro call
+                    Book a free 15-minute intro call
                   </p>
                   <p className="mt-3 text-sm text-cream/70">
                     The live calendar turns on once Cal.com is connected. For now, email to

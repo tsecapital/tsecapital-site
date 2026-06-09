@@ -218,7 +218,7 @@ export const faq = {
 
 export const booking = {
   heading: "Let’s give your team back an hour a day.",
-  sub: "Grab a free 20-minute intro call. We’ll talk through your busywork and whether automation makes sense for you — no pressure, no jargon.",
+  sub: "Grab a free 15-minute intro call. We’ll talk through your busywork and whether automation makes sense for you — no pressure, no jargon.",
 };
 
 export const footer = {
