@@ -106,7 +106,7 @@ I'm Chauncey — ${intro}
 
 For a ${type}, it usually looks like ${example} — running quietly in the background, wired into the tools you already use, with nothing new for your team to learn.
 
-I take on a small number of local businesses directly — I'm the one who builds it, not an agency. I'd be glad to do a free 20-minute call and point out the one or two things in your workflow most worth automating. If there's nothing worth doing, I'll tell you on the call.
+I take on a small number of local businesses directly — I'm the one who builds it, not an agency. I'd be glad to do a free 15-minute call and point out the one or two things in your workflow most worth automating. If there's nothing worth doing, I'll tell you on the call.
 
 Worth a look? My calendar's here: ${CAL} — or just reply and I'll find a time.
 

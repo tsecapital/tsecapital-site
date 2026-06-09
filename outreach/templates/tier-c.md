@@ -15,7 +15,7 @@ Hi {{FirstName}},
 
 I'm Chauncey — I build AI automations for local businesses here in West LA: the repetitive stuff like scheduling, intake, follow-ups, and reporting that eats your team's week.
 
-If you've got a task that feels like it should run itself, it's usually one I can automate. Happy to do a free 20-minute call and take a look — no pressure either way.
+If you've got a task that feels like it should run itself, it's usually one I can automate. Happy to do a free 15-minute call and take a look — no pressure either way.
 
 {{CalLink}}, or just reply.
 

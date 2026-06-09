@@ -21,7 +21,7 @@ I'm Chauncey — I help local businesses here in West LA automate their busywork
 
 That's the kind of thing I automate. For a {{TypeReadable}}, it usually looks like {{Example}} — running quietly in the background, wired into the tools you already use, with nothing new for your team to learn.
 
-I take on a small number of local businesses directly — I'm the one who builds it, not an agency. I'd be glad to do a free 20-minute call and point out the one or two things in your workflow most worth automating. If there's nothing worth doing, I'll tell you on the call.
+I take on a small number of local businesses directly — I'm the one who builds it, not an agency. I'd be glad to do a free 15-minute call and point out the one or two things in your workflow most worth automating. If there's nothing worth doing, I'll tell you on the call.
 
 Worth a look? My calendar's here: {{CalLink}} — or just reply and I'll find a time.
 
@@ -40,7 +40,7 @@ Hi {{FirstName}},
 
 Quick nudge in case this slipped by — no worries if the timing's off.
 
-Short version: I build AI automations for {{TypeReadable}} — things like {{Example}} — and the first 20-minute call is free, with zero obligation.
+Short version: I build AI automations for {{TypeReadable}} — things like {{Example}} — and the first 15-minute call is free, with zero obligation.
 
 Want me to send a 90-second example of what one of these actually looks like instead?
 
@@ -54,6 +54,6 @@ Hi {{FirstName}},
 
 Last note from me — I won't keep cluttering your inbox.
 
-If giving your team a few hours back each week is ever worth 20 minutes, my door's open: {{CalLink}}. Either way, I genuinely wish {{Business}} the best.
+If giving your team a few hours back each week is ever worth 15 minutes, my door's open: {{CalLink}}. Either way, I genuinely wish {{Business}} the best.
 
 — Chauncey

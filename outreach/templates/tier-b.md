@@ -19,7 +19,7 @@ I'm Chauncey — I build AI automations for {{TypeReadable}} here in West LA. {{
 
 The kind of thing I mean: {{Example}}. Built around the tools you already use, run by your team without extra work.
 
-If it's useful, I do a free 20-minute call to spot the one or two things most worth automating for you — and I'll tell you honestly if there's nothing there.
+If it's useful, I do a free 15-minute call to spot the one or two things most worth automating for you — and I'll tell you honestly if there's nothing there.
 
 Open to a quick look? {{CalLink}} — or just reply.
 
@@ -37,7 +37,7 @@ Hi {{FirstName}},
 
 Circling back once in case this is useful — then I'll leave you be.
 
-Free 20-minute call, no obligation: I'll point out what's most worth automating at {{Business}}, or tell you straight if it isn't worth your time.
+Free 15-minute call, no obligation: I'll point out what's most worth automating at {{Business}}, or tell you straight if it isn't worth your time.
 
 {{CalLink}}, or reply and I'll work around your schedule.
 

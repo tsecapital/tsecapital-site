@@ -15,7 +15,7 @@ Pick one per send. The first batch in each list tests best.
 ### Tier B
 - a quick idea for {{Business}}
 - automating the busywork at {{Business}}
-- {{FirstName}}, worth 20 minutes?
+- {{FirstName}}, worth 15 minutes?
 
 ### Tier C (broad)
 - the busywork at {{Business}}
