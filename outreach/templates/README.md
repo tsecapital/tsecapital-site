@@ -24,7 +24,10 @@ Replace these per recipient (mail-merge tool, or by hand for Tier A):
 | `{{Hook}}` / `{{Example}}` | `vertical-snippets.md`, by `Type` | falls back to the `_default_` row |
 | `{{Proof}}` | `Rating` + `Reviews` | optional opener, Tier A/B — real data only |
 | `{{CalLink}}` | `cal.com/chaunceytse/intro` | your live booking link |
-| `{{YourAddress}}` | your business mailing address | **required by law** — see below |
+
+> Emails now end with a simple **`— Chauncey`**; your **Gmail signature** supplies
+> name, contact, and booking link (set it up from `outreach/signature.html`).
+> The signature must also carry your physical address + opt-out — see CAN-SPAM below.
 
 ## Sending sequence
 
@@ -61,10 +64,12 @@ then even your real client email stops landing. Do it slowly and properly:
 Cold B2B email is legal in the US, but you must:
 
 - **Tell the truth in the subject and "from".** The templates do.
-- **Include a valid physical postal address** — that's the `{{YourAddress}}`
-  field. A PO box or registered-agent address is fine. This is not optional.
-- **Offer a clear opt-out and honor it within 10 days.** The "reply 'no thanks'"
-  line covers this; when someone opts out, mark them `passed` and never re-email.
+- **Include a valid physical postal address.** Since the body now ends with just
+  `— Chauncey`, put the address in your **Gmail signature** (a PO box or
+  registered-agent address is fine). This is not optional.
+- **Offer a clear opt-out and honor it within 10 days.** Add a short opt-out line
+  to your Gmail signature (e.g. "Prefer not to hear from me? Just reply and say so").
+  When someone opts out, mark them `passed` and never re-email.
 - Don't use deceptive headers or scraped-and-spammed personal addresses. Stick to
   business/role addresses (`info@`, `office@`), which the enrichment script prefers.
 

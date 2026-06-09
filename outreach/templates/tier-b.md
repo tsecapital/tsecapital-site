@@ -23,11 +23,7 @@ If it's useful, I do a free 15-minute call to spot the one or two things most wo
 
 Open to a quick look? {{CalLink}} — or just reply.
 
-— Chauncey Tse
-AI automation · West Los Angeles · previously at Google, Amex & KPMG
-chauncey.tse@gmail.com
-
-<sub>{{YourAddress}} · Not useful? Reply "no thanks" and I won't write again.</sub>
+— Chauncey
 
 ---
 

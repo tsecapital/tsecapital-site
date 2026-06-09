@@ -25,12 +25,7 @@ I take on a small number of local businesses directly — I'm the one who builds
 
 Worth a look? My calendar's here: {{CalLink}} — or just reply and I'll find a time.
 
-— Chauncey Tse
-AI automation · West Los Angeles
-Previously at Google, American Express & KPMG
-chauncey.tse@gmail.com · tsecapital.co
-
-<sub>{{YourAddress}} · Not useful? Reply "no thanks" and I won't write again.</sub>
+— Chauncey
 
 ---
 

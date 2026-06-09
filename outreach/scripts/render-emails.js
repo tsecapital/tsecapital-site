@@ -1,18 +1,20 @@
 #!/usr/bin/env node
 // ─────────────────────────────────────────────────────────────────────────────
-// render-emails.js — turn the next N emailable leads into ready-to-send drafts.
+// render-emails.js — turn leads into ready-to-send drafts.
 //
-// Picks leads that (a) have an email and (b) haven't been queued/contacted yet,
-// in list order (Tier A first), renders the right per-tier + per-vertical copy
-// with all merge fields filled, writes one draft file per email, and marks each
-// lead `queued` in contacts.csv so a later run never duplicates them.
+// Drafts every emailable lead that hasn't been actually contacted yet (Status
+// blank or "queued"), in list order (Tier A first), up to --limit. Renders the
+// right per-tier + per-vertical copy with merge fields filled, ends each with a
+// simple "— Chauncey" (your Gmail signature auto-appends the rest), writes one
+// file per email named by the lead's global rank, and marks each "queued" so you
+// can track them. The drafts/ folder is cleared each run, so it always reflects
+// your current to-send queue.
 //
 // It does NOT send anything — cold email should go from your own Workspace inbox
-// (best reply rate) or a warmed-up cold-email tool, not a transactional API.
+// (best reply rate), ~20–30/day, not a transactional API.
 //
 // Usage:
-//   node outreach/scripts/render-emails.js                 # next 30
-//   node outreach/scripts/render-emails.js --limit 10
+//   node outreach/scripts/render-emails.js --limit 100
 //   node outreach/scripts/render-emails.js --tier A --date 2026-06-08
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -24,8 +26,9 @@ const CSV_PATH = path.join(__dirname, "..", "contacts.csv");
 const DRAFTS_DIR = path.join(__dirname, "..", "drafts");
 
 const CAL = "cal.com/chaunceytse/intro";
-const ADDRESS = "[ADD YOUR MAILING ADDRESS — required on cold email]";
 const FINANCE = new Set(["Accounting", "Financial advisor", "Insurance", "Mortgage"]);
+// Statuses that mean "already worked" — never re-draft these.
+const ACTIONED = new Set(["contacted", "replied", "call booked", "proposal sent", "won", "passed"]);
 
 // Readable form of the Type for use mid-sentence ("a dental practice").
 const READABLE = {
@@ -73,14 +76,6 @@ const readable = (type) => READABLE[type] || "local business";
 const snippet = (type) => SNIPPET[type] || DEFAULT_SNIPPET;
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
 
-const SIG_FULL = `— Chauncey Tse
-AI automation · West Los Angeles
-Previously at Google, American Express & KPMG
-chauncey.tse@gmail.com · tsecapital.co`;
-const SIG_SHORT = `— Chauncey Tse · previously at Google, Amex & KPMG
-chauncey.tse@gmail.com · tsecapital.co`;
-const optOut = `${ADDRESS} · Not useful? Reply "no thanks" and I won't write again.`;
-
 function render(row) {
   const first = (row.Contact || "").trim() || "there";
   const biz = row.Business;
@@ -110,11 +105,9 @@ I take on a small number of local businesses directly — I'm the one who builds
 
 Worth a look? My calendar's here: ${CAL} — or just reply and I'll find a time.
 
-${tier === "A" ? SIG_FULL : SIG_SHORT}
+— Chauncey`;
 
-${optOut}`;
-
-  return { subject, body, to: row.Email, first };
+  return { subject, body, to: row.Email };
 }
 
 function parseArgs(argv) {
@@ -135,37 +128,52 @@ function main() {
     process.exit(1);
   }
 
+  // Stable global rank among all emailable leads, so draft filenames never
+  // collide between runs / batches.
+  let rank = 0;
+  const rankOf = new Map();
+  for (const r of rows) if ((r.Email || "").trim()) rankOf.set(r, ++rank);
+
   const queue = rows.filter(
-    (r) => (r.Email || "").trim() && !(r.Status || "").trim() && (!args.tier || r.Tier === args.tier)
+    (r) =>
+      (r.Email || "").trim() &&
+      !ACTIONED.has((r.Status || "").trim().toLowerCase()) &&
+      (!args.tier || r.Tier === args.tier)
   ).slice(0, args.limit);
 
   if (queue.length === 0) {
-    console.log("\nNo un-queued leads with an email left to draft. Nothing to do.\n");
+    console.log("\nNothing left to draft (every emailable lead is already contacted).\n");
     return;
   }
 
+  // Fresh drafts folder = your current to-send queue.
+  if (fs.existsSync(DRAFTS_DIR)) {
+    for (const f of fs.readdirSync(DRAFTS_DIR)) if (f.endsWith(".txt")) fs.unlinkSync(path.join(DRAFTS_DIR, f));
+  }
   fs.mkdirSync(DRAFTS_DIR, { recursive: true });
+
   const index = [];
-  queue.forEach((row, i) => {
+  const stamp = args.date ? ` ${args.date}` : "";
+  queue.forEach((row) => {
     const { subject, body, to } = render(row);
-    const n = String(i + 1).padStart(2, "0");
-    const file = path.join(DRAFTS_DIR, `${n}-${slug(row.Business)}.txt`);
-    fs.writeFileSync(file, `To: ${to}\nSubject: ${subject}\n\n${body}\n`);
+    const n = String(rankOf.get(row)).padStart(3, "0");
+    fs.writeFileSync(path.join(DRAFTS_DIR, `${n}-${slug(row.Business)}.txt`), `To: ${to}\nSubject: ${subject}\n\n${body}\n`);
     index.push(`${n}. ${row.Business}  <${to}>  [Tier ${row.Tier}]`);
 
-    // Mark queued so the next run skips it — prevents duplicate sends.
     row.Status = "queued";
-    const stamp = args.date ? ` ${args.date}` : "";
-    row.Notes = ((row.Notes || "").trim() ? row.Notes + " · " : "") + `draft generated${stamp} — send, then set Status=contacted`;
+    if (!/draft generated/.test(row.Notes || "")) {
+      row.Notes = ((row.Notes || "").trim() ? row.Notes + " · " : "") + `draft generated${stamp} — send, then set Status=contacted`;
+    }
   });
 
   fs.writeFileSync(path.join(DRAFTS_DIR, "_index.txt"), index.join("\n") + "\n");
   csv.writeFile(CSV_PATH, headers, rows);
 
-  console.log(`\n✓ Rendered ${queue.length} ready-to-send drafts → ${path.relative(process.cwd(), DRAFTS_DIR)}/`);
-  console.log(`✓ Marked those ${queue.length} leads Status=queued in contacts.csv (won't be re-drafted).`);
-  console.log(`\nBefore sending: replace ${ADDRESS} with your real address, and add a first name where you can.`);
-  console.log(`Send from your Workspace/Gmail inbox, ~20–30/day. Reply received → set Status=contacted (or replied).\n`);
+  const byTier = queue.reduce((a, r) => ((a[r.Tier] = (a[r.Tier] || 0) + 1), a), {});
+  console.log(`\n✓ Rendered ${queue.length} drafts → ${path.relative(process.cwd(), DRAFTS_DIR)}/  (Tier A ${byTier.A || 0} · B ${byTier.B || 0} · C ${byTier.C || 0})`);
+  console.log(`✓ Marked them Status=queued in contacts.csv.`);
+  console.log(`\nEach ends with "— Chauncey" — your Gmail signature fills in the rest.`);
+  console.log(`Add a first name where you can, then send ~20–30/day. Reply in → set Status=contacted.\n`);
 }
 
 main();
