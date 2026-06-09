@@ -70,7 +70,6 @@ export const metadata: Metadata = {
     },
   },
   alternates: { canonical: "/" },
-  other: { "x-autodeploy-test": "live" },
 };
 
 export const viewport: Viewport = {
