@@ -18,7 +18,8 @@
 //      export GMAIL_MAILING_ADDRESS="123 Main St, Los Angeles, CA 90025"   # CAN-SPAM
 //
 // Usage:
-//   node outreach/scripts/send-emails.js --test chauncey.tse@gmail.com   # one test
+//   node outreach/scripts/send-emails.js --test chauncey.tse@gmail.com   # one test (lead #1)
+//   node outreach/scripts/send-emails.js --test you@x.com --rank 30      # test using lead #30's content
 //   node outreach/scripts/send-emails.js --dry --limit 5                 # preview, no send
 //   node outreach/scripts/send-emails.js --limit 25 --delay 60           # send 25, ~60s apart
 // ─────────────────────────────────────────────────────────────────────────────
@@ -76,10 +77,11 @@ function loadSignature() {
 }
 
 function parseArgs(argv) {
-  const out = { test: null, limit: 25, delay: 60, dry: false, date: null };
+  const out = { test: null, limit: 25, delay: 60, dry: false, date: null, rank: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--test") out.test = argv[++i];
+    else if (a === "--rank") out.rank = parseInt(argv[++i], 10) || out.rank;
     else if (a === "--limit") out.limit = parseInt(argv[++i], 10) || out.limit;
     else if (a === "--delay") out.delay = parseInt(argv[++i], 10) || out.delay;
     else if (a === "--dry") out.dry = true;
@@ -121,9 +123,19 @@ async function main() {
 
   // ── Test mode: one email to you, from a real lead's content ────────────────
   if (args.test) {
-    const sample = rows.find((r) => (r.Email || "").trim()) || { Business: "Sample Dental", Type: "Dentist", Reviews: "1206", Rating: "4.9", Email: args.test };
+    // Emailable leads in CSV order share the same numbering as the drafts
+    // (render-emails.js global rank). --rank N picks the Nth one as the sample.
+    const emailable = rows.filter((r) => (r.Email || "").trim());
+    let sample;
+    if (args.rank) {
+      sample = emailable[args.rank - 1];
+      if (!sample) { console.error(`\nNo emailable lead at rank ${args.rank} (only ${emailable.length} have emails).\n`); process.exit(1); }
+    } else {
+      sample = emailable[0];
+    }
+    sample = sample || { Business: "Sample Dental", Type: "Dentist", Reviews: "1206", Rating: "4.9", Email: args.test };
     const { subject, html, text } = buildMessage(sample, sig, address || "123 Example St, Los Angeles, CA 90025");
-    console.log(`Sending TEST (sample: ${sample.Business}) → ${args.test} ...`);
+    console.log(`Sending TEST${args.rank ? ` (lead #${args.rank})` : ""} (sample: ${sample.Business}) → ${args.test} ...`);
     if (args.dry) { console.log(`\nSubject: [TEST] ${subject}\n\n${text}\n`); return; }
     const info = await transporter.sendMail({ from: `"${fromName}" <${user}>`, to: args.test, replyTo, subject: `[TEST] ${subject}`, text, html });
     console.log(`✓ Sent. messageId ${info.messageId}\n  Check ${args.test} (and your Spam folder, just in case).\n`);
@@ -134,7 +146,18 @@ async function main() {
   if (!args.dry && !address) {
     console.warn("⚠ GMAIL_MAILING_ADDRESS not set — emails will omit the CAN-SPAM postal address. Set it before a real campaign.\n");
   }
-  const queue = rows.filter((r) => (r.Email || "").trim() && !ACTIONED.has((r.Status || "").trim().toLowerCase())).slice(0, args.limit);
+  let queue = rows.filter((r) => (r.Email || "").trim() && !ACTIONED.has((r.Status || "").trim().toLowerCase())).slice(0, args.limit);
+  // Never email the same inbox twice in one run (e.g. two locations sharing a
+  // billing@ address) — it reads as spam. Keep the first, drop later dupes.
+  const seenEmails = new Set();
+  const skippedDupes = [];
+  queue = queue.filter((r) => {
+    const e = (r.Email || "").trim().toLowerCase();
+    if (seenEmails.has(e)) { skippedDupes.push(`${r.Business} <${r.Email}>`); return false; }
+    seenEmails.add(e);
+    return true;
+  });
+  if (skippedDupes.length) console.log(`Skipping ${skippedDupes.length} duplicate-inbox lead(s): ${skippedDupes.join("; ")}\n`);
   if (queue.length === 0) { console.log("\nNothing to send (queue empty / all contacted).\n"); return; }
 
   console.log(`${args.dry ? "DRY RUN — would send" : "Sending"} ${queue.length} emails${args.dry ? "" : `, ~${args.delay}s apart`}...\n`);
