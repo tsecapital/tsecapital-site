@@ -1,0 +1,22 @@
+name: Deploy to Coolify
+
+# Auto-deploy: every push to main triggers a Coolify rebuild of tsecapital-site.
+# Requires repo secret COOLIFY_TOKEN (a Coolify API token with deploy permission).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: coolify-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coolify deployment
+        run: |
+          curl --fail-with-body -sS \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            "https://coolify.signalsnitch.io/api/v1/deploy?uuid=i2iz227zovfq2ttwkimhnwqg&force=false"
