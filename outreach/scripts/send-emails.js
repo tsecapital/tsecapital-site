@@ -35,6 +35,20 @@ catch { console.error("\nMissing dependency. Run:  npm install --save-dev nodema
 const CSV_PATH = path.join(__dirname, "..", "contacts.csv");
 const SIG_PATH = path.join(__dirname, "..", "signature.html");
 
+// Load creds from a gitignored .env (outreach/.env or project root) so they live
+// in a file both you and an agent can use — env vars set in another shell don't
+// reach this process. Real environment vars still win over the file.
+(function loadEnv() {
+  for (const p of [path.join(__dirname, "..", ".env"), path.join(__dirname, "..", "..", ".env")]) {
+    try {
+      for (const line of fs.readFileSync(p, "utf8").split(/\r?\n/)) {
+        const m = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*?)\s*$/);
+        if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+      }
+    } catch {}
+  }
+})();
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
