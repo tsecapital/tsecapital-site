@@ -48,6 +48,7 @@ const SNIPPET = {
 const DEFAULT_SNIPPET = ["The repetitive stuff — scheduling, intake, follow-ups, reporting — quietly eats your team's week.", "instant replies to inquiries, automatic reminders and follow-ups, and the manual data entry handled for you"];
 
 const lcFirst = (s) => (s ? s[0].toLowerCase() + s.slice(1) : s);
+const title = (s) => (s ? s[0].toUpperCase() + s.slice(1).toLowerCase() : s);
 const readable = (type) => READABLE[type] || "local business";
 const snippet = (type) => SNIPPET[type] || DEFAULT_SNIPPET;
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40);
@@ -73,6 +74,64 @@ function nameFromBusiness(biz) {
   return toks[0];
 }
 
+// Mailbox local-parts that carry no personal name — never greet someone "Hi Info".
+const GENERIC_LOCAL = new Set([
+  "info", "office", "admin", "hello", "contact", "contactus", "sales", "team", "support",
+  "billing", "accounts", "accounting", "mail", "email", "reception", "frontdesk", "front",
+  "desk", "appointments", "appts", "appt", "scheduling", "schedule", "booking", "bookings",
+  "help", "service", "services", "customerservice", "care", "clinic", "staff", "general",
+  "inquiries", "enquiries", "newpatients", "patients", "intake", "hr", "jobs", "careers",
+  "marketing", "noreply", "webmaster", "postmaster", "taxes", "tax", "remodel", "quotes",
+  "quote", "estimates", "leads", "biz", "business", "owner", "manager", "main", "frontoffice",
+]);
+
+// A first name is "plausible" if it reads like one: 3–9 letters, a vowel up front
+// (so we reject initials+surname like "nsharp" and initial-blobs like "cja"), and
+// not a generic mailbox word.
+const isPlausibleName = (w) => /^[a-z]{3,9}$/.test(w) && /[aeiouy]/.test(w.slice(0, 2)) && !GENERIC_LOCAL.has(w);
+
+// A first name from the email's local-part, only when we can TRUST it. Three ways:
+//   (a) it appears verbatim in the business name      ross@rossweinstein → "Ross Weinstein"
+//   (b) it's a clean firstname.lastname split         tom.homeseller     → Tom
+//   (c) it's a plausible standalone first name         ramona@…           → Ramona
+// Otherwise null — a wrong name is worse than "there", so we'd rather fall back.
+function nameFromEmail(email, biz) {
+  let local = String(email || "").split("@")[0].toLowerCase().trim();
+  local = local.replace(/^(dr|drs)[._-]?/, ""); // drop a leading "dr" (drlorinvogel)
+  const flat = local.replace(/[^a-z]/g, "");
+  if (!flat || GENERIC_LOCAL.has(flat)) return null;
+  // Don't mistake the business's own handle for a name (nailclubla@, hicbuildersinc@).
+  const bizSlug = String(biz || "").toLowerCase().replace(/[^a-z]/g, "");
+  if (flat.length > 4 && bizSlug && (bizSlug.includes(flat) || flat.includes(bizSlug))) return null;
+
+  const tokens = local.split(/[._-]+/).filter(Boolean);
+  const cand = tokens[0] || "";
+  // (a) verbatim in the business name — highest confidence
+  if (/^[a-z]{2,}$/.test(cand) && new RegExp("\\b" + cand + "\\b", "i").test(String(biz || ""))) return title(cand);
+  // (b) clean first.last split, or (c) plausible standalone first name
+  if (isPlausibleName(cand)) return title(cand);
+  return null;
+}
+
+// Does this email land in a ROLE/shared inbox (read by staff) rather than the
+// named person's own inbox? If so we greet "Hi there," — addressing the owner by
+// first name reads oddly when a front-desk person opens it. Personal handles
+// (ross@, cja@, drlorinvogel@, tom.homeseller@) are NOT role inboxes.
+function isRoleInbox(email, biz) {
+  let local = String(email || "").split("@")[0].toLowerCase().trim();
+  local = local.replace(/^(dr|drs)[._-]?/, "");
+  const flat = local.replace(/[^a-z]/g, "");
+  if (!flat || GENERIC_LOCAL.has(flat)) return true;                 // info@, sales@, team@…
+  const bizSlug = String(biz || "").toLowerCase().replace(/[^a-z]/g, "");
+  if (flat.length > 4 && bizSlug && (bizSlug.includes(flat) || flat.includes(bizSlug))) return true; // business catch-all
+  const tokens = local.split(/[._-]+/).filter(Boolean);
+  if (GENERIC_LOCAL.has(tokens[0])) return true;
+  // single-token handles: personal only if short (an initial-blob or one name);
+  // long single tokens are business/location descriptors (reviveshermanoaks@).
+  if (tokens.length === 1 && tokens[0].length > 11) return true;
+  return false;
+}
+
 // row → { subject, body, to, first }. Body ends with "— Chauncey"; the signature
 // (Gmail's, or the one send-emails.js appends) goes after that.
 function composeEmail(row) {
@@ -84,7 +143,11 @@ function composeEmail(row) {
   const rating = String(row.Rating || "").trim();
   const proof = reviews >= 40 && rating ? `${reviews.toLocaleString()} reviews at ${rating}★` : null;
 
-  const first = (row.Contact || "").trim() || nameFromBusiness(biz) || "there";
+  // Personalize the greeting only when the email reaches the person directly; a
+  // role/shared inbox (info@, sales@, a business catch-all) gets "Hi there,".
+  const first = isRoleInbox(row.Email, row.Business)
+    ? "there"
+    : ((row.Contact || "").trim() || nameFromBusiness(biz) || nameFromEmail(row.Email, row.Business) || "there");
   const subject = `a quick idea for ${biz}`;
 
   let intro;
@@ -125,7 +188,7 @@ function composeCall(row) {
   const rating = String(row.Rating || "").trim();
   const proof = reviews >= 40 && rating ? `${reviews.toLocaleString()} reviews at ${rating}★` : null;
 
-  const first = (row.Contact || "").trim() || nameFromBusiness(biz) || null;
+  const first = (row.Contact || "").trim() || nameFromBusiness(biz) || nameFromEmail(row.Email, row.Business) || null;
   const ask = first || "the owner or office manager";
 
   let opener;
@@ -150,4 +213,4 @@ function composeCall(row) {
   return { biz, type, types, first, proof, hook, example, opener, voicemail };
 }
 
-module.exports = { composeEmail, composeCall, cleanBiz, nameFromBusiness, slug, ACTIONED, CAL };
+module.exports = { composeEmail, composeCall, cleanBiz, nameFromBusiness, nameFromEmail, slug, ACTIONED, CAL };
