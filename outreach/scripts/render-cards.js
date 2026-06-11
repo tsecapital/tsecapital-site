@@ -62,8 +62,9 @@ function cardHtml(row, n) {
         ${website ? `<span>${esc(website)}</span>` : ""}
       </div>
       ${address ? `<div class="addr">${esc(address)}</div>` : ""}
+      <div class="askfor">Ask for <b>${esc(c.ask)}</b></div>
       <div class="block">
-        <span class="lbl">Opener</span>
+        <span class="lbl">Opener · when you reach them</span>
         <p>${esc(c.opener)}</p>
       </div>
       <div class="block vm">
@@ -121,9 +122,29 @@ function pageHtml(cards, count, byTier) {
   .door{margin-top:9px;border-top:1px dashed var(--rule);padding-top:7px;
     font-size:10px;line-height:1.35;color:var(--ink2);}
   .door b{color:var(--ink);}
+  .askfor{font-size:11px;color:var(--ink2);margin-top:5px;}
+  .askfor b{color:var(--clay-deep);}
+  /* one-page cold-call playbook (printed once, before the cards) */
+  .play{background:var(--cream);border:1px solid var(--rule);border-radius:11px;
+    margin:0 18px 6px;padding:15px 18px;}
+  .play h3{font-family:var(--display);font-weight:600;font-size:18px;margin:0 0 4px;color:var(--ink);}
+  .play .sub{font-size:11px;color:var(--ink2);margin:0 0 12px;}
+  .play h4{font-family:var(--sans);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--clay-deep);font-weight:700;margin:13px 0 5px;}
+  .pcols>div>h4:first-child{margin-top:0;}
+  .play p{margin:0;font-size:11.5px;line-height:1.42;color:var(--ink2);}
+  .play p b,.play li b{color:var(--ink);}
+  .play ul{margin:0;padding-left:16px;font-size:11.5px;line-height:1.5;color:var(--ink2);}
+  .pcols{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  table.obj{border-collapse:collapse;width:100%;font-size:11px;}
+  table.obj td{border-top:1px solid var(--rule);padding:5px 0;vertical-align:top;line-height:1.34;color:var(--ink2);}
+  table.obj tr:first-child td{border-top:0;}
+  table.obj td:first-child{font-weight:600;color:var(--ink);width:36%;padding-right:10px;}
+  table.obj i{color:var(--clay-deep);font-style:italic;}
   @media print{
     body{background:#fff;}
     .bar,.hint{display:none;}
+    .play{break-after:page;margin:0 0 .2in;}
     .grid{padding:0;gap:.22in;}
     @page{size:letter;margin:.45in;}
   }
@@ -138,6 +159,36 @@ function pageHtml(cards, count, byTier) {
   </div>
   <div class="hint">Phone-only leads (no public email). Work them top-down — Tier A first. As you go, update
     <b>contacts.csv</b>: Channel = call / walk-in, Status, and add the Email if you capture one (it then joins the email queue).</div>
+  <section class="play">
+    <h3>Cold-call playbook</h3>
+    <p class="sub">The per-lead card gives you the opener &amp; voicemail. This is the rest — keep it in view while you dial.</p>
+    <div class="pcols">
+      <div>
+        <h4>Get past the front desk</h4>
+        <p>Smile — they can hear it. <i>"Hi! Is the owner or office manager in by any chance? I'm Chauncey, I'm local."</i>
+          If they're out, the win is the <b>name + best email</b> — it drops straight into your email queue.</p>
+        <h4>Once you reach them — ask, don't pitch</h4>
+        <ul>
+          <li><b>Magic wand:</b> "If one front-desk task could run itself — scheduling, reminders, follow-ups — what would you pick?"</li>
+          <li><b>Finance:</b> "Where does the team lose the most time — reporting, data entry, chasing documents?"</li>
+          <li><b>Then go deeper:</b> "What's that costing you in hours a week?"</li>
+        </ul>
+        <h4>The ask — close with confidence</h4>
+        <p>Book the free 15: <b>cal.com/chaunceytse/intro</b>. Use an alternative close — <i>"mornings or afternoons better?"</i>
+          — not "let me know." On any no, still <b>get the email</b>.</p>
+      </div>
+      <div>
+        <h4>Common objections → what to say</h4>
+        <table class="obj">
+          <tr><td>"Just email me something."</td><td>"Will do — two lines, I promise. Quick though: what eats the most front-desk time right now?" <i>(get the email)</i></td></tr>
+          <tr><td>"We're all set / not interested."</td><td>"Totally fair — most folks I help weren't looking. If one task could run itself, what would it be?"</td></tr>
+          <tr><td>"We already have a system / someone."</td><td>"Makes sense — I don't replace it, I automate the gaps around it. What's the one thing it still doesn't handle?"</td></tr>
+          <tr><td>"How much does it cost?"</td><td>"Depends what we automate — that's what the free 15 is for. Most start small. Want to grab a time?"</td></tr>
+          <tr><td>"No time right now."</td><td>"I'll be quick — or what's better for a 15-minute call, mornings or afternoons?"</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
   <div class="grid">
 ${cards}
   </div>

@@ -2,6 +2,9 @@
 // send-emails.js (automated send), so the wording never drifts between them.
 
 const CAL = "cal.com/chaunceytse/intro";
+// Callback number read aloud in voicemails — set this so drops leave a number to
+// call/text back (voicemail best practice: state it, then repeat it).
+const CALLBACK = "(323) 388-8202";
 const FINANCE = new Set(["Accounting", "Financial advisor", "Insurance", "Mortgage"]);
 // Statuses that mean "already worked" — never re-contact these.
 const ACTIONED = new Set(["contacted", "replied", "call booked", "proposal sent", "won", "passed"]);
@@ -83,7 +86,13 @@ const GENERIC_LOCAL = new Set([
   "inquiries", "enquiries", "newpatients", "patients", "intake", "hr", "jobs", "careers",
   "marketing", "noreply", "webmaster", "postmaster", "taxes", "tax", "remodel", "quotes",
   "quote", "estimates", "leads", "biz", "business", "owner", "manager", "main", "frontoffice",
+  // professional-role / specialty / entity abbreviations — never first names
+  "cpa", "dds", "dmd", "md", "do", "od", "dc", "dpm", "dvm", "esq", "pa", "np", "rn",
+  "endo", "perio", "ortho", "ent", "derm", "obgyn", "dental", "law", "legal", "smile",
+  "pc", "apc", "llp", "llc", "inc", "corp",
 ]);
+// Professional suffixes that get glued onto a personal handle (samcpa@, jamesdds@).
+const ROLE_SUFFIX = /(cpa|dds|dmd|esq|dpm|dvm)$/;
 
 // A first name is "plausible" if it reads like one: 3–9 letters, a vowel up front
 // (so we reject initials+surname like "nsharp" and initial-blobs like "cja"), and
@@ -105,7 +114,9 @@ function nameFromEmail(email, biz) {
   if (flat.length > 4 && bizSlug && (bizSlug.includes(flat) || flat.includes(bizSlug))) return null;
 
   const tokens = local.split(/[._-]+/).filter(Boolean);
-  const cand = tokens[0] || "";
+  let cand = tokens[0] || "";
+  const base = cand.replace(ROLE_SUFFIX, ""); // samcpa → sam, jamesdds → james
+  if (base.length >= 3 && base !== cand) cand = base;
   // (a) verbatim in the business name — highest confidence
   if (/^[a-z]{2,}$/.test(cand) && new RegExp("\\b" + cand + "\\b", "i").test(String(biz || ""))) return title(cand);
   // (b) clean first.last split, or (c) plausible standalone first name
@@ -191,26 +202,30 @@ function composeCall(row) {
   const first = (row.Contact || "").trim() || nameFromBusiness(biz) || nameFromEmail(row.Email, row.Business) || null;
   const ask = first || "the owner or office manager";
 
+  // Opener: lead with a research observation (their own traction) and ask, don't
+  // pitch — then a confident alternative close (15-min call OR the best email).
   let opener;
   if (FINANCE.has(row.Type)) {
     opener =
-      `Hi — is ${first || "the owner"} in? I'm Chauncey, I'm local here in West LA. ` +
-      `I spent years in accounting and business intelligence at Google, American Express, and KPMG, ` +
-      `and I now automate the reporting, reconciliations, and data entry that quietly eat a firm's week. ` +
-      `Could I borrow two minutes — or grab the best email to send a short note?`;
+      `Hi ${first || "there"} — I'm Chauncey, I'm local in West LA. I spent years in accounting and ` +
+      `business intelligence at Google, American Express, and KPMG, and I now automate the reporting, ` +
+      `reconciliations, and data entry that quietly eat a firm's week — for practices like ${biz}. ` +
+      `Could I steal fifteen minutes this week to show where it'd save the most time — or grab the best email for a short note?`;
   } else {
     opener =
-      `Hi — is ${ask} around? I'm Chauncey, I'm local here in West LA and I help ${types} ` +
-      `automate the front-desk busywork with AI. ${hook} I build the kind of thing that handles ` +
-      `that quietly in the background. Could I borrow two minutes — or grab the best email to send a short note?`;
+      `Hi ${first || "there"} — I'm Chauncey, I'm local in West LA and I build AI automation for ${types}. ` +
+      `I came across ${biz}${proof ? ` — ${proof} is hard to miss` : ""}. ${hook} I quietly automate exactly ` +
+      `that, wired into the tools you already use. Could I steal fifteen minutes this week to point out the one ` +
+      `or two things most worth automating — or grab the best email to send a short note?`;
   }
 
+  // Voicemail: ~20s, hook → who+why → value → clear CTA with the number repeated.
   const voicemail =
-    `Hi, this is Chauncey — I'm local in West LA and I help ${types} automate the repetitive ` +
-    `busywork, things like ${example}. No pressure: if it's useful my calendar's at ${CAL}, ` +
-    `or I'll try you back. Thanks!`;
+    `Hi ${first || "there"}, this is Chauncey — I build AI automation for ${types} here in West LA. ` +
+    `${proof ? `Saw ${biz} is doing great` : `Came across ${biz}`} and had one idea to take some busywork ` +
+    `off your team's plate. Worth a quick look — call or text me at ${CALLBACK}; again, that's ${CALLBACK}. Thanks!`;
 
-  return { biz, type, types, first, proof, hook, example, opener, voicemail };
+  return { biz, type, types, first, ask, proof, hook, example, opener, voicemail };
 }
 
 module.exports = { composeEmail, composeCall, cleanBiz, nameFromBusiness, nameFromEmail, slug, ACTIONED, CAL };
