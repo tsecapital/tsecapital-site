@@ -13,12 +13,12 @@
 // Setup (one time):
 //   1. Gmail → Account → Security → turn on 2-Step Verification.
 //   2. https://myaccount.google.com/apppasswords → create an app password.
-//   3. export GMAIL_USER="chauncey.tse@gmail.com"
+//   3. export GMAIL_USER="chauncey@tsecapital.co"
 //      export GMAIL_APP_PASSWORD="the 16-char app password"
 //      export GMAIL_MAILING_ADDRESS="123 Main St, Los Angeles, CA 90025"   # CAN-SPAM
 //
 // Usage:
-//   node outreach/scripts/send-emails.js --test chauncey.tse@gmail.com   # one test (lead #1)
+//   node outreach/scripts/send-emails.js --test chauncey@tsecapital.co   # one test (lead #1)
 //   node outreach/scripts/send-emails.js --test you@x.com --rank 30      # test using lead #30's content
 //   node outreach/scripts/send-emails.js --dry --limit 5                 # preview, no send
 //   node outreach/scripts/send-emails.js --limit 25 --delay 60           # send 25, ~60s apart
@@ -57,13 +57,13 @@ const DEFAULT_SIG_HTML =
   `<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#555;">` +
   `<b style="color:#1a1a1a;">Chauncey Tse</b><br>` +
   `AI Automation for Local Business · West Los Angeles<br>` +
-  `<a href="mailto:chauncey.tse@gmail.com" style="color:#555;">chauncey.tse@gmail.com</a> · ` +
+  `<a href="mailto:chauncey@tsecapital.co" style="color:#555;">chauncey@tsecapital.co</a> · ` +
   `<a href="https://tsecapital.co" style="color:#555;">tsecapital.co</a><br>` +
   `<a href="https://cal.com/chaunceytse/intro" style="color:#bd5a36;font-weight:bold;">Book a 15-minute call →</a><br>` +
   `<span style="font-size:11px;color:#999;">Previously at Google · American Express · KPMG</span></div>`;
 const DEFAULT_SIG_TEXT =
   `Chauncey Tse\nAI Automation for Local Business · West Los Angeles\n` +
-  `chauncey.tse@gmail.com · tsecapital.co\nBook a call: cal.com/chaunceytse/intro\n` +
+  `chauncey@tsecapital.co · tsecapital.co\nBook a call: cal.com/chaunceytse/intro\n` +
   `Previously at Google, American Express & KPMG`;
 
 // Pull the signature table out of signature.html if present; else use the default.
