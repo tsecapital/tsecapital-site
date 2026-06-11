@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Leave-behind — postcard (5×7")</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#f4eee2; --cream:#f9f4ec; --ink:#221d16; --ink2:#5c5446;
+    --clay:#bd5a36; --clay-deep:#9c4527; --brass:#b58e54; --rule:#d8cbb2; --espresso:#1c1811;
+    --display:"Fraunces",Georgia,serif; --sans:"Hanken Grotesk",ui-sans-serif,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{background:#cfc4ad;font-family:var(--sans);color:var(--ink);
+    display:flex;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .page{position:relative;width:5in;min-height:7in;background:var(--paper);
+    padding:0.42in 0.42in 0.38in;box-shadow:0 18px 50px rgba(40,30,18,.28);overflow:hidden;
+    display:flex;flex-direction:column;}
+  .page::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .pill{display:inline-block;align-self:flex-start;background:var(--clay);color:var(--cream);
+    font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+    padding:4px 10px;border-radius:999px;}
+  h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;color:var(--espresso);
+    font-size:25px;line-height:1.05;letter-spacing:-.01em;margin:.18in 0 .09in;}
+  h1 em{font-style:italic;font-weight:400;color:var(--clay-deep);}
+  .lead{font-size:11.5px;line-height:1.45;color:var(--ink2);margin:0 0 .16in;}
+  .panel{background:var(--cream);border:1px solid var(--rule);border-radius:10px;
+    padding:11px 13px;margin:0 0 .14in;}
+  .panel h2{font-family:var(--sans);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--clay-deep);font-weight:700;margin:0 0 8px;}
+  .panel ul{list-style:none;margin:0;padding:0;display:grid;gap:7px;}
+  .panel li{display:flex;gap:9px;font-size:11px;line-height:1.3;color:var(--ink2);}
+  .panel li::before{content:"";flex:none;width:6px;height:6px;margin-top:4px;border-radius:2px;
+    background:var(--clay);transform:rotate(45deg);}
+  .panel b{font-weight:600;color:var(--ink);}
+  .angle{border-left:3px solid var(--clay);padding:1px 0 1px 11px;margin:0 0 .12in;
+    font-family:var(--display);font-style:italic;font-size:12.5px;line-height:1.3;color:var(--ink);}
+  .offer{font-size:10.5px;line-height:1.4;color:var(--ink2);margin:0 0 .14in;}
+  .offer b{color:var(--ink);}
+  .foot{margin-top:auto;border-top:1px solid var(--rule);padding-top:11px;
+    display:flex;justify-content:space-between;align-items:center;gap:14px;}
+  .who{font-family:var(--display);font-weight:600;font-size:14.5px;color:var(--espresso);line-height:1.1;}
+  .who span{display:block;font-family:var(--sans);font-weight:500;font-size:9.5px;
+    letter-spacing:.04em;color:var(--ink2);margin:2px 0 7px;}
+  .book{display:inline-block;background:var(--clay);color:var(--cream);font-weight:600;
+    font-size:10.5px;padding:6px 12px;border-radius:999px;text-decoration:none;}
+  .lines{font-size:9.5px;line-height:1.5;color:var(--ink2);margin-top:6px;}
+  .lines a{color:var(--clay-deep);text-decoration:none;font-weight:600;}
+  .qrmini{text-align:center;}
+  .qrcard{background:#fff;border:1px solid var(--rule);border-radius:9px;padding:7px;}
+  .qr{display:block;width:0.92in;height:0.92in;}
+  .qrcap{font-size:9px;letter-spacing:.04em;color:var(--ink2);margin-top:4px;font-weight:600;}
+  .qrcap b{color:var(--clay-deep);}
+  @media print{ body{background:#fff;padding:0;} .page{box-shadow:none;width:auto;min-height:auto;}
+    @page{size:5in 7in;margin:0;} }
+</style>
+</head>
+<body>
+  <div class="page">
+    <span class="pill">AI automation · West Los Angeles</span>
+    <h1>The busywork is quietly <em>costing you a hire.</em></h1>
+    <p class="lead">I’m Chauncey. I put Claude — today’s most capable AI — to work on the repetitive
+      tasks that eat your team’s week, wired into the tools you already use.</p>
+    <div class="panel">
+      <h2>What I can take off your plate</h2>
+      <ul>
+        <li><div><b>Intake &amp; forms that fill themselves in</b> — no retyping into three systems.</div></li>
+        <li><div><b>Reminders &amp; rebooking on their own</b> — fewer no-shows, zero phone tag.</div></li>
+        <li><div><b>Instant replies to every inquiry</b> — so no lead goes cold.</div></li>
+        <li><div><b>The monthly report, built for you</b> — automatically, not by hand.</div></li>
+      </ul>
+    </div>
+    <p class="angle">A real engineer — not an agency. I build it myself, for a small number of local businesses.</p>
+    <p class="offer"><b>Free 15-minute call.</b> I’ll point out the one or two things most worth automating — and if there’s nothing worth doing, I’ll tell you.</p>
+    <div class="foot">
+      <div class="foot-left">
+        <div class="who">Chauncey Tse<span>AI Engineer · West LA</span></div>
+        <a class="book" href="https://cal.com/chaunceytse/intro">Book a free call →</a>
+        <div class="lines">cal.com/chaunceytse/intro<br/>chauncey@tsecapital.co</div>
+      </div>
+      <div class="qrmini">
+        <div class="qrcard">
+          <svg class="qr" viewBox="0 0 33 33" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR code to tsecapital.co"><path fill="#ffffff" d="M0 0h33v33H0z"/><path stroke="#000000" d="M4 4.5h7m3 0h1m2 0h1m2 0h1m1 0h7M4 5.5h1m5 0h1m3 0h3m1 0h3m1 0h1m5 0h1M4 6.5h1m1 0h3m1 0h1m1 0h2m2 0h1m2 0h1m2 0h1m1 0h3m1 0h1M4 7.5h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m2 0h1m1 0h3m1 0h1M4 8.5h1m1 0h3m1 0h1m1 0h6m2 0h1m1 0h1m1 0h3m1 0h1M4 9.5h1m5 0h1m1 0h1m1 0h1m2 0h3m2 0h1m5 0h1M4 10.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M12 11.5h1m2 0h2m2 0h2M4 12.5h1m1 0h5m3 0h7m1 0h5M4 13.5h1m2 0h2m2 0h1m1 0h2m1 0h1m3 0h2m1 0h1m3 0h1M5 14.5h1m2 0h1m1 0h1m3 0h1m1 0h2m1 0h2m1 0h1m2 0h1m1 0h2M4 15.5h4m4 0h1m1 0h2m2 0h2m1 0h1m1 0h1m4 0h1M5 16.5h2m1 0h3m1 0h1m1 0h1m1 0h3m2 0h4m1 0h3M4 17.5h3m1 0h1m2 0h4m2 0h1m2 0h1m2 0h1m1 0h1m1 0h1M4 18.5h1m1 0h2m2 0h1m1 0h1m2 0h5m1 0h5m1 0h2M4 19.5h1m1 0h4m1 0h1m3 0h1m2 0h2m1 0h4m3 0h1M4 20.5h1m3 0h8m3 0h6m1 0h1M12 21.5h1m3 0h2m2 0h1m3 0h2M4 22.5h7m2 0h1m3 0h2m1 0h1m1 0h1m1 0h1m1 0h3M4 23.5h1m5 0h1m1 0h1m1 0h1m1 0h2m2 0h1m3 0h2m1 0h2M4 24.5h1m1 0h3m1 0h1m1 0h3m1 0h1m1 0h7m1 0h3M4 25.5h1m1 0h3m1 0h1m1 0h1m8 0h2m1 0h5M4 26.5h1m1 0h3m1 0h1m1 0h1m1 0h3m2 0h1m5 0h2m1 0h1M4 27.5h1m5 0h1m2 0h3m2 0h3m1 0h4m2 0h1M4 28.5h7m1 0h1m2 0h1m5 0h1m1 0h6"/></svg>
+        </div>
+        <div class="qrcap">Scan → <b>tsecapital.co</b></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

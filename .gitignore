@@ -40,6 +40,7 @@ yarn-error.log*
 /outreach/*.csv
 /outreach/drafts/
 /outreach/signature.html
+/outreach/cards/
 
 # typescript
 *.tsbuildinfo

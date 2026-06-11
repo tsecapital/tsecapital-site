@@ -112,4 +112,42 @@ Worth a look? My calendar's here: ${CAL} — or just reply and I'll find a time.
   return { subject, body, to: row.Email, first };
 }
 
-module.exports = { composeEmail, cleanBiz, nameFromBusiness, slug, ACTIONED, CAL };
+// row → spoken call + voicemail script for phone-only leads (no public email).
+// Reuses the same per-vertical hook/example + proof logic as composeEmail, so the
+// phone wording never drifts from the email wording.
+function composeCall(row) {
+  const biz = cleanBiz(row.Business);
+  const type = readable(row.Type);
+  const types = plural(type);
+  const [hook, example] = snippet(row.Type);
+
+  const reviews = parseInt(String(row.Reviews || "").replace(/[^0-9]/g, ""), 10) || 0;
+  const rating = String(row.Rating || "").trim();
+  const proof = reviews >= 40 && rating ? `${reviews.toLocaleString()} reviews at ${rating}★` : null;
+
+  const first = (row.Contact || "").trim() || nameFromBusiness(biz) || null;
+  const ask = first || "the owner or office manager";
+
+  let opener;
+  if (FINANCE.has(row.Type)) {
+    opener =
+      `Hi — is ${first || "the owner"} in? I'm Chauncey, I'm local here in West LA. ` +
+      `I spent years in accounting and business intelligence at Google, American Express, and KPMG, ` +
+      `and I now automate the reporting, reconciliations, and data entry that quietly eat a firm's week. ` +
+      `Could I borrow two minutes — or grab the best email to send a short note?`;
+  } else {
+    opener =
+      `Hi — is ${ask} around? I'm Chauncey, I'm local here in West LA and I help ${types} ` +
+      `automate the front-desk busywork with AI. ${hook} I build the kind of thing that handles ` +
+      `that quietly in the background. Could I borrow two minutes — or grab the best email to send a short note?`;
+  }
+
+  const voicemail =
+    `Hi, this is Chauncey — I'm local in West LA and I help ${types} automate the repetitive ` +
+    `busywork, things like ${example}. No pressure: if it's useful my calendar's at ${CAL}, ` +
+    `or I'll try you back. Thanks!`;
+
+  return { biz, type, types, first, proof, hook, example, opener, voicemail };
+}
+
+module.exports = { composeEmail, composeCall, cleanBiz, nameFromBusiness, slug, ACTIONED, CAL };
